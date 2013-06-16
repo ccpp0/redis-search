@@ -67,7 +67,9 @@ class Redis
           if Search.config.pinyin_match
             # covert Chinese to pinyin to as an index
             pinyin_full = Search.split_pinyin(title)
-            pinyin_first = pinyin_full.collect { |p| p[0] }.join("")
+            pinyin_first = pinyin_full.collect { |p| 
+              (p =~ /^\d+$/) ? p : p.first
+            }.join('')
             words += pinyin_full
             words << pinyin_first
             pinyin_full = nil
@@ -83,10 +85,13 @@ class Redis
             Redis::Search.config.redis.sadd(Search.mk_sets_key(self.type,val), self.id)
             if Search.config.pinyin_match
               pinyin_full = Search.split_pinyin(val.downcase)
-              pinyin_first = pinyin_full.collect { |p| p[0] }.join("")
+              pinyin_first = pinyin_full.collect { |p| 
+                (p =~ /^\d+$/) ? p : p.first
+              }.join("")
               pinyin = pinyin_full.join("")
               words << pinyin
               words << pinyin_first
+
               Redis::Search.config.redis.sadd(Search.mk_sets_key(self.type,pinyin), self.id)
               pinyin_full = nil
               pinyin_first = nil

@@ -176,6 +176,8 @@ class Redis
     protected
       def self.split_pinyin(text)
         # Pinyin search split as pinyin again
+        return [] if text.nil? || text.size < 1
+
         _split(Pinyin.t(text))
       end
   
@@ -184,6 +186,8 @@ class Redis
         # return chars if disabled rmmseg
         return text.split("") if Search.config.disable_rmmseg
           
+        return [] if text.nil? || text.size < 1
+
         algor = RMMSeg::Algorithm.new(text)
         words = []
         loop do

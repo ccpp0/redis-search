@@ -58,13 +58,15 @@ class Redis
         end
 
         # remove set for prefix index key
-        Redis::Search.config.redis.srem(Search.mk_sets_key(type,options[:title]),options[:id])
+        if options[:title].present?
+          Redis::Search.config.redis.srem(Search.mk_sets_key(type,options[:title]),options[:id])
+        end
       end
 
       private
         def self.split_words_for_index(title)
           words = Search.split(title)
-          if Search.config.pinyin_match
+          if words.size > 0 && Search.config.pinyin_match
             # covert Chinese to pinyin to as an index
             pinyin_full = Search.split_pinyin(title)
             pinyin_first = pinyin_full.collect { |p| 
